@@ -29,3 +29,13 @@ struct ber_diagram_s_pre {
     uint height;
     std::vector<std::vector<float>> measurements;
 };
+
+struct EyeData {
+    std::vector<std::vector<float>> img;
+    std::vector<int> xticks;
+    std::vector<int> yticks;
+    std::string date;
+    std::string time;
+    std::string header;
+    bool bathtub;
+};
