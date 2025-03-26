@@ -13,6 +13,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
 
+# --- Find Boost ----------------------------------------------------------------
+find_package(Boost 1.60 REQUIRED COMPONENTS filesystem system)
+
+# Include Boost headers
+include_directories(${Boost_INCLUDE_DIRS})
+
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 set(FETCHCONTENT_QUIET OFF)
 
@@ -29,6 +35,7 @@ FetchContent_MakeAvailable(ftxui)
 add_executable(iscan-tui
   src/main.cpp
   src/display.cpp
+  src/test.cpp
 )
 target_include_directories(iscan-tui PRIVATE src)
 
@@ -36,4 +43,5 @@ target_link_libraries(iscan-tui
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component  # Not needed for this example.
+  PRIVATE ${Boost_LIBRARIES}  # Link Boost.Filesystem and Boost.System
 )

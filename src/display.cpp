@@ -50,3 +50,20 @@ void draw_ber_diagram(const ber_diagram_s& diagram)
 
     draw_canvas(canvas);
 }
+
+void draw_ber_diagram_pre(const ber_diagram_s_pre& diagram)
+{
+    auto canvas = ftxui::Canvas(diagram.width, diagram.height);
+
+    for (int y = 0; y < diagram.height; y++) {
+        for (int x = 0; x < diagram.width; x++) {
+            auto const& measurement = diagram.measurements[y][x];
+            
+            uint8_t hue = (uint8_t)(-std::log10(measurement) * 20.f);
+
+            canvas.DrawPoint(x, y, true, ftxui::Color::HSV(hue, 255, 255));
+        }
+    }
+
+    draw_canvas(canvas);
+}
