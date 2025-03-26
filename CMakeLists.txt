@@ -29,6 +29,7 @@ FetchContent_MakeAvailable(ftxui)
 add_executable(iscan-tui
   src/main.cpp
   src/display.cpp
+  src/parser.cpp
 )
 target_include_directories(iscan-tui PRIVATE src)
 

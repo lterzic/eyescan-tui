@@ -1,17 +1,17 @@
 #include <iostream>
 #include <cmath>
 
-#include "types.h"
+#include "parser.h"
 #include "display.h"
 
-ber_diagram_s test_diagram(uint width, uint height)
+sweep_s test_sweep(uint width, uint height)
 {
-    ber_diagram_s diagram {
+    sweep_s sweep {
         .width = width,
         .height = height,
-        .measurements = std::vector<std::vector<point_ber_s>>(
+        .ber = std::vector<std::vector<float>>(
             height,
-            std::vector<point_ber_s>(width, {0})
+            std::vector<float>(width, {0})
         )
     };
 
@@ -19,17 +19,15 @@ ber_diagram_s test_diagram(uint width, uint height)
         for (int x = 0; x < width; x++) {
             int xdist = x - (int)width / 2;
             int ydist = y - (int)height / 2;
-
-            diagram.measurements[y][x].sample_count = width * width + height * height;
-            diagram.measurements[y][x].error_count = std::pow(xdist*xdist + ydist*ydist, 1.2);
+            sweep.ber[y][x] = xdist * xdist + ydist * ydist;
         }
     }
-
-    return diagram;
+    return sweep;
 }
 
 int main()
 {
-    draw_ber_diagram(test_diagram(120, 80));
+    colormap_s map {.min = 0, .max = 2000, .min_hue = 0, .max_hue = 160};
+    display_sweep(test_sweep(120, 80), map);
     return 0;
 }

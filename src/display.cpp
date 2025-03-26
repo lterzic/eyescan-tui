@@ -1,6 +1,7 @@
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <string>
-#include <cmath>
 
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/canvas.hpp>
@@ -8,6 +9,10 @@
 
 #include "display.h"
 
+
+/**
+ * Draw a canvas to the terminal without scrolling
+ */
 static void draw_canvas(const ftxui::Canvas& canvas)
 {
     // Print without scrolling the terminal
@@ -17,12 +22,6 @@ static void draw_canvas(const ftxui::Canvas& canvas)
         ftxui::Dimension::Full(),
         ftxui::Dimension::Full()
     );
-
-    // auto dim = ftxui::Dimensions {
-    //     canvas.width() / 2,
-    //     canvas.height() / 3
-    // };
-    // ftxui::Screen screen = ftxui::Screen::Create(dim);
     
     auto element = ftxui::canvas(&canvas);
     ftxui::Render(screen, element);
@@ -33,16 +32,20 @@ static void draw_canvas(const ftxui::Canvas& canvas)
     reset_position = screen.ResetPosition();
 }
 
-void draw_ber_diagram(const ber_diagram_s& diagram)
+/**
+ * Create a terminal canvas with the sweep plotted
+ */
+void display_sweep(const sweep_s& sweep, const colormap_s& colormap)
 {
-    auto canvas = ftxui::Canvas(diagram.width, diagram.height);
+    auto canvas = ftxui::Canvas(sweep.width, sweep.height);
 
-    for (int y = 0; y < diagram.height; y++) {
-        for (int x = 0; x < diagram.width; x++) {
-            auto const& measurement = diagram.measurements[y][x];
+    for (uint y = 0; y < sweep.height; y++) {
+        for (uint x = 0; x < sweep.width; x++) {
+            float value = sweep.ber[y][x];
+            float clamped = std::clamp(value, colormap.min, colormap.max);
             
-            float ber = measurement.error_count / (float)measurement.sample_count;
-            uint8_t hue = (uint8_t)(-std::log10(ber) * 20.f);
+            float ratio = (clamped - colormap.min) / (colormap.max - colormap.min);
+            uint8_t hue = (uint8_t)((float)colormap.min_hue + (colormap.max_hue - colormap.min_hue) * ratio);
 
             canvas.DrawPoint(x, y, true, ftxui::Color::HSV(hue, 255, 255));
         }
