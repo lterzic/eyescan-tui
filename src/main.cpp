@@ -27,7 +27,7 @@ sweep_s test_sweep(uint width, uint height)
 
 int main()
 {
-    colormap_s map {.min = 0, .max = 2000, .min_hue = 0, .max_hue = 160};
+    colormap_s map {.min = 0, .max = 6, .min_hue = 0, .max_hue = 180};
     sweep_s file_sweep = read_scan_file(std::cin);
     std::cout << "Sweep dimensions (w, h): " << file_sweep.width << " " << file_sweep.height << '\n';
 
