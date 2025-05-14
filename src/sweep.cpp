@@ -1,4 +1,5 @@
 #include "sweep.h"
+#include <cmath>
 #include <string>
 #include <sstream>
 
@@ -54,9 +55,36 @@ sweep::sweep(std::istream& input)
         assert(row.size() == m_width);
 }
 
-sweep sweep::scale(size_t width, size_t height) const
+sweep sweep::scale(size_t new_width, size_t new_height) const
 {
-    return *this;
+    // Only downscaling allowed
+    assert(new_width <= m_width);
+    assert(new_height <= m_height);
+
+    // Create a sweep with the new dimensions
+    sweep scaled;
+    scaled.m_width = new_width;
+    scaled.m_height = new_height;
+    scaled.m_data = data_t(new_height, row_t(new_width, 0));
+
+    // Multiply a new position with these coefficients
+    // to get the position in the original sweep
+    float hor_scale = new_width / (float)m_width;
+    float ver_scale = new_height / (float)m_height;
+
+    for (size_t r = 0; r < m_height; r++) {
+        for (size_t c = 0; c < m_width; c++) {
+            size_t scaled_r = std::floor(r * ver_scale);
+            size_t scaled_c = std::floor(c * hor_scale);
+            scaled.m_data[scaled_r][scaled_c] += m_data[r][c];
+        }
+    }
+    for (auto& row : scaled.m_data) {
+        for (auto& col : row) {
+            col *= hor_scale * ver_scale;
+        }
+    }
+    return scaled;
 }
 
 }
