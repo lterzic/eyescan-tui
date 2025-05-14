@@ -1,41 +1,37 @@
-#include "parser.h"
+#include "sweep.h"
 #include <string>
 #include <sstream>
 
+namespace iscan {
+
 template <typename num_type>
-inline std::vector<num_type> read_number_list(std::istream& input)
+static std::vector<num_type> read_number_list(std::istream& input)
 {
     std::vector<num_type> vector;
     num_type num;
-    char tmp;
+    char separator;
 
     while (input >> num) {
         vector.push_back(num);
-        input >> tmp;
+        input >> separator;
     }
     return vector;
 }
 
-sweep_s read_scan_file(std::istream& input)
+sweep::sweep(std::istream& input)
 {
-    sweep_s sweep;
     std::string tmp;
     
     // Skip first 10 lines
     for (int i = 0; i < 10; i++) std::getline(input, tmp);
 
-    // Can be "1d" or "2d"
+    // Read the scan type from the beginning of the line (can be 1d or 2d)
+    // and then read (skip) the rest of the line as it's not needed
     std::string scan_type;
     input >> scan_type;
-    
-    // Read until the first comma (horizontal index) and then
-    // store from first index to end of the line in tmp
-    std::getline(input, tmp, ',');
     std::getline(input, tmp);
 
-    std::istringstream iss(tmp);
-    auto hor_indices = read_number_list<int>(iss);
-
+    // Parse each line into a row of the sweep
     while (std::getline(input, tmp)) {
         if (tmp == "Scan End")
             break;
@@ -47,11 +43,20 @@ sweep_s read_scan_file(std::istream& input)
         // First number is the line index
         line_data.erase(line_data.begin());
 
-        sweep.ber.push_back(line_data);
+        m_data.push_back(line_data);
     }
     
-    sweep.width = hor_indices.size();
-    sweep.height = sweep.ber.size();
+    m_width = m_data[0].size();
+    m_height = m_data.size();
 
-    return sweep;
+    // Make sure that all rows are the same size
+    for (const auto& row : m_data)
+        assert(row.size() == m_width);
+}
+
+sweep sweep::scale(size_t width, size_t height) const
+{
+    return *this;
+}
+
 }

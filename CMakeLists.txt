@@ -29,12 +29,12 @@ FetchContent_MakeAvailable(ftxui)
 add_executable(iscan-tui
   src/main.cpp
   src/display.cpp
-  src/parser.cpp
+  src/sweep.cpp
 )
 target_include_directories(iscan-tui PRIVATE src)
 
 target_link_libraries(iscan-tui
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
-  PRIVATE ftxui::component  # Not needed for this example.
+  PRIVATE ftxui::component
 )
