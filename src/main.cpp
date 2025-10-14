@@ -8,11 +8,9 @@
 #include "sweep.h"
 #include "display.h"
 
-// Generate a list of all files in the folder
-static std::map<std::tuple<int, int, int>, std::filesystem::path> files;
-// Number of channels for (slr, site)
-static std::map<std::pair<int, int>, int> channel_count;
-
+// Map (slr, site) pair to a map of channel id to file path. This way
+// a list of scans (channels) for a site can be looped through.
+static std::map<std::pair<int, int>, std::map<int, std::filesystem::path>> files;
 
 static void parse_file(std::filesystem::path file_path)
 {
@@ -28,9 +26,7 @@ static void parse_file(std::filesystem::path file_path)
     ss.get();
     ss >> channel;
 
-    files[{slr, site, channel}] = file_path;
-    // Compute the number of channels
-    channel_count[{slr, site}] = std::max(channel_count[{slr, site}], channel + 1);
+    files[{slr, site}][channel] = file_path;
 }
 
 static void parse_dir(std::filesystem::path dir_path)
@@ -47,14 +43,10 @@ static void parse_dir(std::filesystem::path dir_path)
     }
 }
 
-
-int main(int argc, char* argv[])
+static auto parse_args(int argc, char* argv[])
 {
-    // First argument is the path to the folder containing all the scans
-    std::filesystem::path input_path = "/home/lterzic/dev/iscan-tui/scans/csv";
-
     std::map<std::string, std::vector<std::string>> arg_map;
-    
+
     std::string curr_arg;
     for (int argi = 0; argi < argc; argi++) {
         std::string argstr(argv[argi]);
@@ -66,6 +58,13 @@ int main(int argc, char* argv[])
             arg_map[curr_arg].push_back(argstr);
         }
     }
+
+    return arg_map;
+}
+
+int main(int argc, char* argv[])
+{
+    auto arg_map = parse_args(argc, argv);
 
     if (arg_map.find("dir") != arg_map.end()) {
         for (auto& dir : arg_map["dir"]) {
@@ -82,22 +81,23 @@ int main(int argc, char* argv[])
     int slr = arg_map.find("slr") == arg_map.end() ? 0 : std::stoi(arg_map["slr"][0]);
     int site = arg_map.find("site") == arg_map.end() ? 0 : std::stoi(arg_map["site"][0]);
     int cols = arg_map.find("cols") == arg_map.end() ? 2 : std::stoi(arg_map["cols"][0]);
+    int scan_w = 32, scan_h = 16; // TODO: As arg
+
+    std::cout << "SLR: " << slr << std::endl;
+    std::cout << "Site: " << site << std::endl;
+    std::cout << "Available scans: " << files[{slr, site}].size() << std::endl;
 
     iscan::colormap_s map {.min = 2.5, .max = 4, .min_hue = 180, .max_hue = 0};
 
-    std::cout << "COLS: " << cols << "\n";
-
     ftxui::Elements rows;
     ftxui::Elements curr_row;
-    for (int ch = 0; ch < 16; ch++) {
-        const auto& file = files[{slr, site, ch}];
-        // std::cout << file.filename().string() << std::endl;
+    for (auto& [ch, file] : files[{slr, site}]) {
 
         std::ifstream in_file;
         in_file.open(file.string());
         iscan::sweep file_sweep(in_file);
 
-        auto scaled = file_sweep.scale(32, 16);
+        auto scaled = file_sweep.scale(scan_w, scan_h);
         auto document = iscan::draw_sweep(scaled, map);
         curr_row.push_back(document);
 
@@ -109,8 +109,10 @@ int main(int argc, char* argv[])
     if (!curr_row.empty())
         rows.push_back(ftxui::hbox(curr_row));
 
-    ftxui::Screen screen(100, 120);
-    ftxui::Render(screen, ftxui::vbox(rows));
+    auto grid = ftxui::vbox(rows);
+
+    ftxui::Screen screen(cols * scan_w + 1, rows.size() * scan_h + 1);
+    ftxui::Render(screen, grid);
     screen.Print();
     std::cout << "\n";
     return 0;
