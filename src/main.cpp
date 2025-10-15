@@ -5,8 +5,9 @@
 #include <utility>
 #include <cmath>
 
-#include "sweep.h"
+#include "args.h"
 #include "display.h"
+#include "sweep.h"
 
 // Map (slr, site) pair to a map of channel id to file path. This way
 // a list of scans (channels) for a site can be looped through.
@@ -43,28 +44,9 @@ static void parse_dir(std::filesystem::path dir_path)
     }
 }
 
-static auto parse_args(int argc, char* argv[])
-{
-    std::map<std::string, std::vector<std::string>> arg_map;
-
-    std::string curr_arg;
-    for (int argi = 0; argi < argc; argi++) {
-        std::string argstr(argv[argi]);
-        
-        if (argstr.substr(0, 2) == "--") {
-            curr_arg = argstr.substr(2);
-            continue;
-        } else {
-            arg_map[curr_arg].push_back(argstr);
-        }
-    }
-
-    return arg_map;
-}
-
 int main(int argc, char* argv[])
 {
-    auto arg_map = parse_args(argc, argv);
+    auto arg_map = eyescan::parse_args(argc, argv);
 
     if (arg_map.find("dir") != arg_map.end()) {
         for (auto& dir : arg_map["dir"]) {
@@ -78,10 +60,11 @@ int main(int argc, char* argv[])
         }
     }
 
-    int slr = arg_map.find("slr") == arg_map.end() ? 0 : std::stoi(arg_map["slr"][0]);
-    int site = arg_map.find("site") == arg_map.end() ? 0 : std::stoi(arg_map["site"][0]);
-    int cols = arg_map.find("cols") == arg_map.end() ? 2 : std::stoi(arg_map["cols"][0]);
-    int scan_w = 32, scan_h = 16; // TODO: As arg
+    int slr = eyescan::get_arg_or_default(arg_map, "slr", 0);
+    int site = eyescan::get_arg_or_default(arg_map, "site", 0);
+    int cols = eyescan::get_arg_or_default(arg_map, "cols", 2);
+    int scan_w = eyescan::get_arg_or_default(arg_map, "scan_w", 32);
+    int scan_h = eyescan::get_arg_or_default(arg_map, "scan_h", 16);
 
     std::cout << "SLR: " << slr << std::endl;
     std::cout << "Site: " << site << std::endl;

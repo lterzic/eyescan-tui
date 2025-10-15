@@ -28,6 +28,7 @@ FetchContent_MakeAvailable(ftxui)
 
 add_executable(eyescan-tui
   src/main.cpp
+  src/args.cpp
   src/display.cpp
   src/sweep.cpp
 )
