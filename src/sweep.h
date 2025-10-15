@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-namespace iscan {
+namespace eyescan {
 
 // 2d-grid of samples
 class sweep {

@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.22)
 
-project(iscan-tui
+project(eyescan-tui
   LANGUAGES CXX
   VERSION 1.0.0
 )
@@ -26,14 +26,14 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 
-add_executable(iscan-tui
+add_executable(eyescan-tui
   src/main.cpp
   src/display.cpp
   src/sweep.cpp
 )
-target_include_directories(iscan-tui PRIVATE src)
+target_include_directories(eyescan-tui PRIVATE src)
 
-target_link_libraries(iscan-tui
+target_link_libraries(eyescan-tui
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component

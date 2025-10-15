@@ -21,5 +21,5 @@ Tool accepts the following arguments (no built-in help menu yet):
 ### Example
 Once built, to run the tool on the scans in this repository, run:
 ```
-./build/iscan-tui --cols 4 --dir ./scans/csv --site 1
+./build/eyescan-tui --cols 4 --dir ./scans/csv --site 1
 ```

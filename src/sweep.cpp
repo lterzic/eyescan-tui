@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 
-namespace iscan {
+namespace eyescan {
 
 template <typename num_type>
 static std::vector<num_type> read_number_list(std::istream& input)

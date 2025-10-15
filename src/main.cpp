@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     std::cout << "Site: " << site << std::endl;
     std::cout << "Available scans: " << files[{slr, site}].size() << std::endl;
 
-    iscan::colormap_s map {.min = 2.5, .max = 4, .min_hue = 180, .max_hue = 0};
+    eyescan::colormap_s map {.min = 2.5, .max = 4, .min_hue = 180, .max_hue = 0};
 
     ftxui::Elements rows;
     ftxui::Elements curr_row;
@@ -95,10 +95,10 @@ int main(int argc, char* argv[])
 
         std::ifstream in_file;
         in_file.open(file.string());
-        iscan::sweep file_sweep(in_file);
+        eyescan::sweep file_sweep(in_file);
 
         auto scaled = file_sweep.scale(scan_w, scan_h);
-        auto document = iscan::draw_sweep(scaled, map);
+        auto document = eyescan::draw_sweep(scaled, map);
         curr_row.push_back(document);
 
         if (ch >= cols - 1 && ch % cols == cols - 1) {

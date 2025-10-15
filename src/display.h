@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cstdint>
 
-namespace iscan {
+namespace eyescan {
 
 // Clamp diagram values between min and max
 // Scale hue linearly with value from min_hue to max_hue

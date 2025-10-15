@@ -3,7 +3,7 @@
 #include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
 
-namespace iscan {
+namespace eyescan {
 
 ftxui::Element draw_sweep(const sweep& sweep, const colormap_s& colormap)
 {
